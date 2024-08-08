@@ -54,7 +54,6 @@ INSERT INTO token_price (unit_name, price, market_cap, timestamp) VALUES
 ('coreum', 0.1, 0, '2024-08-07T12:00:00.000');
 
 INSERT INTO token_price_history (unit_name, price, market_cap, timestamp) VALUES
-INSERT INTO token_price_history (unit_name, price, market_cap, timestamp) VALUES
 ('coreum', 0.065781, 0, '2024-08-05T22:17:50.949'),
 ('coreum', 0.065741, 0, '2024-08-05T22:07:14.246'),
 ('coreum', 0.065572, 0, '2024-08-05T21:56:55.105'),
