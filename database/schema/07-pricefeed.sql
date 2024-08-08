@@ -51,7 +51,7 @@ INSERT INTO token_unit (token_name, denom, exponent, aliases, price_id) VALUES
 
 -- Insert current token prices
 INSERT INTO token_price (unit_name, price, market_cap, timestamp) VALUES
-('coreum', 0, 0, '2024-08-07T12:00:00.000'),
+('coreum', 0, 0, '2024-08-07T12:00:00.000');
 
 INSERT INTO token_price_history (unit_name, price, market_cap, timestamp) VALUES
 ('coreum', 0, 0, '2024-07-27T12:00:00.000'),
