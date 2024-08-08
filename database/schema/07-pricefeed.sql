@@ -42,12 +42,12 @@ CREATE TABLE token_price_history
 CREATE INDEX token_price_history_timestamp_index ON token_price_history (timestamp);
 
 INSERT INTO token_price_history (unit_name, price, market_cap, timestamp) VALUES
-('coreum', 0, 0, '2024-08-08 00:37:55'),
-('coreum', 0, 0, '2024-08-08 00:26:57'),
-('coreum', 0, 0, '2024-08-07 23:59:59'),
-('coreum', 0, 0, '2024-08-08 00:37:55'),
-('coreum', 0, 0, '2024-08-08 00:26:57'),
-('coreum', 0, 0, '2024-08-07 23:59:59'),
-('coreum', 0, 0, '2024-08-08 00:37:55'),
-('coreum', 0, 0, '2024-08-08 00:26:57'),
-('coreum', 0, 0, '2024-08-07 23:59:59');
+('coreum', 0, 0, '2024-08-07 12:00:00'),
+('coreum', 0, 0, '2024-08-07 13:00:00'),
+('coreum', 0, 0, '2024-08-07 14:00:00'),
+('coreum', 0, 0, '2024-08-07 15:00:00'),
+('coreum', 0, 0, '2024-08-07 16:00:00'),
+('coreum', 0, 0, '2024-08-07 17:00:00'),
+('coreum', 0, 0, '2024-08-07 18:00:00'),
+('coreum', 0, 0, '2024-08-07 19:00:00'),
+('coreum', 0, 0, '2024-08-07 20:00:00');
