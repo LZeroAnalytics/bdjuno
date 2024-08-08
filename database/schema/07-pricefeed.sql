@@ -50,4 +50,4 @@ INSERT INTO token_price_history (unit_name, price, market_cap, timestamp) VALUES
 ('coreum', 0, 0, '2024-08-07 23:59:59'),
 ('coreum', 0, 0, '2024-08-08 00:37:55'),
 ('coreum', 0, 0, '2024-08-08 00:26:57'),
-('corem', 0, 0, '2024-08-07 23:59:59');
+('coreum', 0, 0, '2024-08-07 23:59:59');
