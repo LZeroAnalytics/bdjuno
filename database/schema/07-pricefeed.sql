@@ -40,3 +40,14 @@ CREATE TABLE token_price_history
     CONSTRAINT unique_price_for_timestamp UNIQUE (unit_name, timestamp)
 );
 CREATE INDEX token_price_history_timestamp_index ON token_price_history (timestamp);
+
+INSERT INTO token_price_history (unit_name, price, market_cap, timestamp) VALUES
+('coreum', 0, 0, '2024-08-08 00:37:55'),
+('coreum', 0, 0, '2024-08-08 00:26:57'),
+('coreum', 0, 0, '2024-08-07 23:59:59'),
+('coreum', 0, 0, '2024-08-08 00:37:55'),
+('coreum', 0, 0, '2024-08-08 00:26:57'),
+('coreum', 0, 0, '2024-08-07 23:59:59'),
+('coreum', 0, 0, '2024-08-08 00:37:55'),
+('coreum', 0, 0, '2024-08-08 00:26:57'),
+('corem', 0, 0, '2024-08-07 23:59:59');
