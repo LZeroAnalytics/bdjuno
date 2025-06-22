@@ -1,9 +1,8 @@
 package auth
 
 import (
-	"fmt"
-
-	"github.com/forbole/bdjuno/v4/types"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	"github.com/forbole/callisto/v4/types"
 	"github.com/rs/zerolog/log"
 )
 
@@ -12,10 +11,7 @@ func (m *Module) UpdateParams(height int64) error {
 	log.Debug().Str("module", "auth").Int64("height", height).
 		Msg("updating params")
 
-	params, err := m.source.GetParams(height)
-	if err != nil {
-		return fmt.Errorf("error while getting params: %s", err)
-	}
+	params := authtypes.DefaultParams()
 
 	return m.db.SaveAuthParams(types.NewAuthParams(params, height))
 }

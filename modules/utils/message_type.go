@@ -13,6 +13,8 @@ func GetModuleNameFromTypeURL(input string) string {
 			return moduleName[1] // e.g. "cosmos.bank.v1beta1.MsgSend" => "bank"
 		case strings.Contains(moduleName[0], "ibc"):
 			return fmt.Sprintf("%s %s %s", moduleName[0], moduleName[1], moduleName[2]) // e.g. "ibc.core.client.v1.MsgUpdateClient" => "ibc core client"
+		case strings.Contains(moduleName[0], "types"):
+			return "bank" // e.g. "types.MsgSend" => "bank" (Thorchain custom message)
 		default:
 			return fmt.Sprintf("%s %s", moduleName[0], moduleName[1]) // e.g. "cosmwasm.wasm.v1.MsgExecuteContract" => "cosmwasm wasm"
 		}

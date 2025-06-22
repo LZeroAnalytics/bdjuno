@@ -2,7 +2,7 @@ package remote
 
 import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	authsource "github.com/forbole/bdjuno/v4/modules/auth/source"
+	authsource "github.com/forbole/callisto/v4/modules/auth/source"
 	"github.com/forbole/juno/v5/node/remote"
 )
 
