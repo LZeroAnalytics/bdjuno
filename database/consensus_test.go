@@ -3,8 +3,8 @@ package database_test
 import (
 	"time"
 
-	dbtypes "github.com/forbole/bdjuno/v4/database/types"
-	"github.com/forbole/bdjuno/v4/types"
+	dbtypes "github.com/forbole/callisto/v4/database/types"
+	"github.com/forbole/callisto/v4/types"
 )
 
 func (suite *DbTestSuite) TestSaveConsensus_GetBlockHeightTimeMinuteAgo() {
@@ -74,9 +74,8 @@ func (suite *DbTestSuite) TestSaveConsensus_GetBlockHeightTimeDayAgo() {
 
 func (suite *DbTestSuite) TestSaveConsensus_SaveAverageBlockTimePerMin() {
 	// Save the data
-	updated, err := suite.database.SaveAverageBlockTimePerMin(5.05, 10)
+	err := suite.database.SaveAverageBlockTimePerMin(5.05, 10)
 	suite.Require().NoError(err)
-	suite.Require().True(updated)
 
 	original := dbtypes.NewAverageTimeRow(5.05, 10)
 
@@ -90,9 +89,8 @@ func (suite *DbTestSuite) TestSaveConsensus_SaveAverageBlockTimePerMin() {
 	// ----------------------------------------------------------------------------------------------------------------
 
 	// Try updating with a lower height
-	updated, err = suite.database.SaveAverageBlockTimePerMin(6, 9)
+	err = suite.database.SaveAverageBlockTimePerMin(6, 9)
 	suite.Require().NoError(err)
-	suite.Require().False(updated)
 
 	// Verify the data
 	rows = []dbtypes.AverageTimeRow{}
@@ -104,9 +102,8 @@ func (suite *DbTestSuite) TestSaveConsensus_SaveAverageBlockTimePerMin() {
 	// ----------------------------------------------------------------------------------------------------------------
 
 	// Try updating with the same height
-	updated, err = suite.database.SaveAverageBlockTimePerMin(10, 10)
+	err = suite.database.SaveAverageBlockTimePerMin(10, 10)
 	suite.Require().NoError(err)
-	suite.Require().True(updated)
 
 	// Verify the data
 	expected := dbtypes.NewAverageTimeRow(10, 10)
@@ -120,9 +117,8 @@ func (suite *DbTestSuite) TestSaveConsensus_SaveAverageBlockTimePerMin() {
 	// ----------------------------------------------------------------------------------------------------------------
 
 	// Try updating with a higher height
-	updated, err = suite.database.SaveAverageBlockTimePerMin(20, 15)
+	err = suite.database.SaveAverageBlockTimePerMin(20, 15)
 	suite.Require().NoError(err)
-	suite.Require().True(updated)
 
 	// Verify the data
 	expected = dbtypes.NewAverageTimeRow(20, 15)
@@ -136,9 +132,8 @@ func (suite *DbTestSuite) TestSaveConsensus_SaveAverageBlockTimePerMin() {
 
 func (suite *DbTestSuite) TestSaveConsensus_SaveAverageBlockTimePerHour() {
 	// Save the data
-	updated, err := suite.database.SaveAverageBlockTimePerHour(5.05, 10)
+	err := suite.database.SaveAverageBlockTimePerHour(5.05, 10)
 	suite.Require().NoError(err)
-	suite.Require().True(updated)
 
 	original := dbtypes.NewAverageTimeRow(5.05, 10)
 
@@ -152,9 +147,8 @@ func (suite *DbTestSuite) TestSaveConsensus_SaveAverageBlockTimePerHour() {
 	// ----------------------------------------------------------------------------------------------------------------
 
 	// Try updating with a lower height
-	updated, err = suite.database.SaveAverageBlockTimePerHour(6, 9)
+	err = suite.database.SaveAverageBlockTimePerHour(6, 9)
 	suite.Require().NoError(err)
-	suite.Require().False(updated)
 
 	// Verify the data
 	rows = []dbtypes.AverageTimeRow{}
@@ -166,9 +160,8 @@ func (suite *DbTestSuite) TestSaveConsensus_SaveAverageBlockTimePerHour() {
 	// ----------------------------------------------------------------------------------------------------------------
 
 	// Try updating with the same height
-	updated, err = suite.database.SaveAverageBlockTimePerHour(10, 10)
+	err = suite.database.SaveAverageBlockTimePerHour(10, 10)
 	suite.Require().NoError(err)
-	suite.Require().True(updated)
 
 	// Verify the data
 	expected := dbtypes.NewAverageTimeRow(10, 10)
@@ -182,9 +175,8 @@ func (suite *DbTestSuite) TestSaveConsensus_SaveAverageBlockTimePerHour() {
 	// ----------------------------------------------------------------------------------------------------------------
 
 	// Try updating with a higher height
-	updated, err = suite.database.SaveAverageBlockTimePerHour(20, 15)
+	err = suite.database.SaveAverageBlockTimePerHour(20, 15)
 	suite.Require().NoError(err)
-	suite.Require().True(updated)
 
 	// Verify the data
 	expected = dbtypes.NewAverageTimeRow(20, 15)
@@ -198,9 +190,8 @@ func (suite *DbTestSuite) TestSaveConsensus_SaveAverageBlockTimePerHour() {
 
 func (suite *DbTestSuite) TestSaveConsensus_SaveAverageBlockTimePerDay() {
 	// Save the data
-	updated, err := suite.database.SaveAverageBlockTimePerDay(5.05, 10)
+	err := suite.database.SaveAverageBlockTimePerDay(5.05, 10)
 	suite.Require().NoError(err)
-	suite.Require().True(updated)
 
 	original := dbtypes.NewAverageTimeRow(5.05, 10)
 
@@ -214,9 +205,8 @@ func (suite *DbTestSuite) TestSaveConsensus_SaveAverageBlockTimePerDay() {
 	// ----------------------------------------------------------------------------------------------------------------
 
 	// Try updating with a lower height
-	updated, err = suite.database.SaveAverageBlockTimePerDay(6, 9)
+	err = suite.database.SaveAverageBlockTimePerDay(6, 9)
 	suite.Require().NoError(err)
-	suite.Require().False(updated)
 
 	// Verify the data
 	rows = []dbtypes.AverageTimeRow{}
@@ -228,9 +218,8 @@ func (suite *DbTestSuite) TestSaveConsensus_SaveAverageBlockTimePerDay() {
 	// ----------------------------------------------------------------------------------------------------------------
 
 	// Try updating with the same height
-	updated, err = suite.database.SaveAverageBlockTimePerDay(10, 10)
+	err = suite.database.SaveAverageBlockTimePerDay(10, 10)
 	suite.Require().NoError(err)
-	suite.Require().True(updated)
 
 	// Verify the data
 	expected := dbtypes.NewAverageTimeRow(10, 10)
@@ -244,9 +233,8 @@ func (suite *DbTestSuite) TestSaveConsensus_SaveAverageBlockTimePerDay() {
 	// ----------------------------------------------------------------------------------------------------------------
 
 	// Try updating with a higher height
-	updated, err = suite.database.SaveAverageBlockTimePerDay(20, 15)
+	err = suite.database.SaveAverageBlockTimePerDay(20, 15)
 	suite.Require().NoError(err)
-	suite.Require().True(updated)
 
 	// Verify the data
 	expected = dbtypes.NewAverageTimeRow(20, 15)

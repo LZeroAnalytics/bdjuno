@@ -3,11 +3,10 @@ package consensus
 import (
 	"fmt"
 
-	"github.com/forbole/bdjuno/v4/modules/actions/logging"
 	"github.com/go-co-op/gocron"
 	"github.com/rs/zerolog/log"
 
-	"github.com/forbole/bdjuno/v4/modules/utils"
+	"github.com/forbole/callisto/v4/modules/utils"
 )
 
 // RegisterPeriodicOperations implements modules.Module
@@ -62,19 +61,11 @@ func (m *Module) updateBlockTimeInMinute() error {
 
 	minute, err := m.db.GetBlockHeightTimeMinuteAgo(block.Timestamp)
 	if err != nil {
-		return fmt.Errorf("error while gettting block height a minute ago: %s", err)
+		return fmt.Errorf("error while getting block height a minute ago: %s", err)
 	}
 	newBlockTime := block.Timestamp.Sub(minute.Timestamp).Seconds() / float64(block.Height-minute.Height)
 
-	updated, err := m.db.SaveAverageBlockTimePerMin(newBlockTime, block.Height)
-	if err != nil {
-		return err
-	}
-	if updated {
-		logging.BlockTimeGauge.WithLabelValues("minute").Set(newBlockTime)
-	}
-
-	return nil
+	return m.db.SaveAverageBlockTimePerMin(newBlockTime, block.Height)
 }
 
 // updateBlockTimeInHour insert average block time in the latest hour
@@ -108,15 +99,7 @@ func (m *Module) updateBlockTimeInHour() error {
 	}
 	newBlockTime := block.Timestamp.Sub(hour.Timestamp).Seconds() / float64(block.Height-hour.Height)
 
-	updated, err := m.db.SaveAverageBlockTimePerHour(newBlockTime, block.Height)
-	if err != nil {
-		return err
-	}
-	if updated {
-		logging.BlockTimeGauge.WithLabelValues("hour").Set(newBlockTime)
-	}
-
-	return nil
+	return m.db.SaveAverageBlockTimePerHour(newBlockTime, block.Height)
 }
 
 // updateBlockTimeInDay insert average block time in the latest minute
@@ -150,14 +133,5 @@ func (m *Module) updateBlockTimeInDay() error {
 	}
 	newBlockTime := block.Timestamp.Sub(day.Timestamp).Seconds() / float64(block.Height-day.Height)
 
-	updated, err := m.db.SaveAverageBlockTimePerDay(newBlockTime, block.Height)
-	if err != nil {
-		return err
-	}
-	if updated {
-		logging.BlockTimeGauge.WithLabelValues("day").Set(newBlockTime)
-	}
-
-	return nil
-
+	return m.db.SaveAverageBlockTimePerDay(newBlockTime, block.Height)
 }

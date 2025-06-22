@@ -9,8 +9,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/forbole/juno/v5/node/local"
 
-	"github.com/forbole/bdjuno/v4/modules/bank/source"
-	"github.com/forbole/bdjuno/v4/types"
+	"github.com/forbole/callisto/v4/modules/bank/source"
+	"github.com/forbole/callisto/v4/types"
 )
 
 var (
@@ -95,18 +95,4 @@ func (s Source) GetAccountBalance(address string, height int64) ([]sdk.Coin, err
 	}
 
 	return balRes.Balances, nil
-}
-
-// GetAccountDenomBalance implements bankkeeper.Source
-func (s Source) GetAccountDenomBalance(address string, denom string, height int64) (*sdk.Coin, error) {
-	ctx, err := s.LoadHeight(height)
-	if err != nil {
-		return nil, fmt.Errorf("error while loading height: %s", err)
-	}
-	balRes, err := s.q.Balance(sdk.WrapSDKContext(ctx), &banktypes.QueryBalanceRequest{Address: address, Denom: denom})
-	if err != nil {
-		return nil, fmt.Errorf("error while getting all balances: %s", err)
-	}
-
-	return balRes.Balance, nil
 }

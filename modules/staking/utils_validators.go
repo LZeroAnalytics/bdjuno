@@ -2,11 +2,9 @@ package staking
 
 import (
 	"fmt"
-	"strings"
 
-	"github.com/forbole/bdjuno/v4/modules/staking/keybase"
-	"github.com/forbole/bdjuno/v4/types"
-	"google.golang.org/grpc/codes"
+	"github.com/forbole/callisto/v4/modules/staking/keybase"
+	"github.com/forbole/callisto/v4/types"
 
 	"github.com/rs/zerolog/log"
 
@@ -34,7 +32,7 @@ func (m *Module) getValidatorConsAddr(validator stakingtypes.Validator) (sdk.Con
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-// ConvertValidator converts the given staking validator into a BDJuno validator
+// ConvertValidator converts the given staking validator into a Callisto validator
 func (m *Module) convertValidator(height int64, validator stakingtypes.Validator) (types.Validator, error) {
 	consAddr, err := m.getValidatorConsAddr(validator)
 	if err != nil {
@@ -82,40 +80,14 @@ func (m *Module) convertValidatorDescription(
 // RefreshAllValidatorInfos refreshes the info of all the validators at the given height
 func (m *Module) RefreshAllValidatorInfos(height int64) error {
 	// Get all validators
-	validatorsFromDb, err := m.db.GetValidators()
+	validators, err := m.source.GetValidatorsWithStatus(height, "")
 	if err != nil {
-		return fmt.Errorf("error while getting validators from db: %s", err)
-	}
-
-	validatorsFromHeight, err := m.source.GetValidatorsWithStatus(height, "")
-	if err != nil {
-		return fmt.Errorf("error while getting validators from db: %s", err)
-	}
-
-	validators := make([]types.Validator, 0)
-	validatorsMap := make(map[string]bool)
-
-	for _, validator := range validatorsFromDb {
-		validators = append(validators, validator)
-		validatorsMap[validator.GetOperator()] = true
-	}
-
-	for _, validator := range validatorsFromHeight {
-		// Check if the validator already exists in validatorsFromDb
-		if _, exists := validatorsMap[validator.OperatorAddress]; !exists {
-			// Convert and append the validator if it doesn't exist in validatorsFromDb
-			convertedValidator, err := m.convertValidator(height, validator)
-			if err != nil {
-				return fmt.Errorf("error while converting validator: %s", err)
-			}
-			validators = append(validators, convertedValidator)
-			validatorsMap[validator.OperatorAddress] = true
-		}
+		return fmt.Errorf("error while getting validators: %s", err)
 	}
 
 	// Refresh each validator
 	for _, validator := range validators {
-		err = m.RefreshValidatorInfos(height, validator.GetOperator())
+		err = m.RefreshValidatorInfos(height, validator.OperatorAddress)
 		if err != nil {
 			return fmt.Errorf("error while refreshing validator: %s", err)
 		}
@@ -126,27 +98,12 @@ func (m *Module) RefreshAllValidatorInfos(height int64) error {
 
 // RefreshValidatorInfos refreshes the info for the validator with the given operator address at the provided height
 func (m *Module) RefreshValidatorInfos(height int64, valOper string) error {
-	validator := types.NewValidator(valOper, "", "", "", nil, nil, height)
 	stakingValidator, err := m.source.GetValidator(height, valOper)
 	if err != nil {
-		if strings.Contains(err.Error(), codes.NotFound.String()) {
-			validator, err = m.db.GetValidator(valOper)
-			if err != nil {
-				return fmt.Errorf("error while getting validator from db: %s", err)
-			}
-
-			err = m.db.SaveValidatorsStatuses([]types.ValidatorStatus{types.NewValidatorStatus(validator.GetConsAddr(), validator.GetConsPubKey(), int(stakingtypes.Unbonded), true, height)})
-			if err != nil {
-				return fmt.Errorf("error while saving validator status to db: %s", err)
-			}
-
-			return nil
-		}
-
 		return err
 	}
 
-	validator, err = m.convertValidator(height, stakingValidator)
+	validator, err := m.convertValidator(height, stakingValidator)
 	if err != nil {
 		return fmt.Errorf("error while converting validator: %s", err)
 	}
@@ -253,7 +210,7 @@ func (m *Module) UpdateValidatorStatuses() error {
 		return fmt.Errorf("error while getting latest block height from db: %s", err)
 	}
 
-	validators, _, err := m.GetValidatorsWithStatus(block.Height, "")
+	validators, _, err := m.GetValidatorsWithStatus(block.Height, stakingtypes.Bonded.String())
 	if err != nil {
 		return fmt.Errorf("error while getting validators with bonded status: %s", err)
 	}
@@ -313,10 +270,10 @@ func (m *Module) updateProposalValidatorStatusSnapshot(
 // updateValidatorStatusAndVP updates validators status
 // and validators voting power
 func (m *Module) updateValidatorStatusAndVP(height int64, validators []stakingtypes.Validator) error {
-	votingPowers := make([]types.ValidatorVotingPower, 0, len(validators))
-	statuses := make([]types.ValidatorStatus, 0, len(validators))
+	votingPowers := make([]types.ValidatorVotingPower, len(validators))
+	statuses := make([]types.ValidatorStatus, len(validators))
 
-	for _, validator := range validators {
+	for index, validator := range validators {
 		consAddr, err := validator.GetConsAddr()
 		if err != nil {
 			return err
@@ -331,15 +288,15 @@ func (m *Module) updateValidatorStatusAndVP(height int64, validators []stakingty
 			return err
 		}
 
-		votingPowers = append(votingPowers, types.NewValidatorVotingPower(consAddr.String(), validator.Tokens.Int64(), height))
+		votingPowers[index] = types.NewValidatorVotingPower(consAddr.String(), validator.Tokens.Int64(), height)
 
-		statuses = append(statuses, types.NewValidatorStatus(
+		statuses[index] = types.NewValidatorStatus(
 			consAddr.String(),
 			consPubKey.String(),
 			int(validator.GetStatus()),
 			validator.IsJailed(),
 			height,
-		))
+		)
 	}
 
 	log.Debug().Str("module", "staking").Msg("refreshing validator voting power")

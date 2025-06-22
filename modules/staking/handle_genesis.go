@@ -6,7 +6,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/types/tx"
 
-	"github.com/forbole/bdjuno/v4/types"
+	"github.com/forbole/callisto/v4/types"
 
 	tmtypes "github.com/cometbft/cometbft/types"
 
@@ -24,7 +24,7 @@ func (m *Module) HandleGenesis(doc *tmtypes.GenesisDoc, appState map[string]json
 	var genState stakingtypes.GenesisState
 	err := m.cdc.UnmarshalJSON(appState[stakingtypes.ModuleName], &genState)
 	if err != nil {
-		return fmt.Errorf("error while unmarshaling staking state: %s", err)
+		return fmt.Errorf("error while unmarshalling staking state: %s", err)
 	}
 
 	// Save the params
@@ -106,10 +106,7 @@ func (m *Module) saveValidators(doc *tmtypes.GenesisDoc, validators stakingtypes
 		vals[i] = validator
 	}
 
-	if err := m.db.SaveValidatorsData(vals); err != nil {
-		return err
-	}
-	return m.UpdateValidatorStatuses()
+	return m.db.SaveValidatorsData(vals)
 }
 
 // saveValidatorDescription saves the description for the given validators

@@ -3,9 +3,9 @@ package database
 import (
 	"fmt"
 
-	"github.com/forbole/bdjuno/v4/types"
+	"github.com/forbole/callisto/v4/types"
 
-	dbtypes "github.com/forbole/bdjuno/v4/database/types"
+	dbtypes "github.com/forbole/callisto/v4/database/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
@@ -378,11 +378,7 @@ func (db *Db) SaveValidatorsVotingPowers(entries []types.ValidatorVotingPower) e
 	for i, entry := range entries {
 		pi := i * 3
 		stmt += fmt.Sprintf("($%d,$%d,$%d),", pi+1, pi+2, pi+3)
-		if entry.Height == 0 {
-			params = append(params, entry.ConsensusAddress, entry.VotingPower, nil)
-		} else {
-			params = append(params, entry.ConsensusAddress, entry.VotingPower, entry.Height)
-		}
+		params = append(params, entry.ConsensusAddress, entry.VotingPower, entry.Height)
 	}
 
 	stmt = stmt[:len(stmt)-1]
@@ -440,7 +436,7 @@ ON CONFLICT (validator_address) DO UPDATE
 WHERE validator_status.height <= excluded.height`
 	_, err = db.SQL.Exec(statusStmt, statusParams...)
 	if err != nil {
-		return fmt.Errorf("error while stroring validators statuses: %s", err)
+		return fmt.Errorf("error while storing validators statuses: %s", err)
 	}
 
 	return nil

@@ -1,46 +1,42 @@
 package modules
 
 import (
-	"github.com/forbole/bdjuno/v4/modules/actions"
-	"github.com/forbole/bdjuno/v4/modules/addresses"
-	"github.com/forbole/bdjuno/v4/modules/types"
+	"github.com/forbole/callisto/v4/modules/actions"
+	"github.com/forbole/callisto/v4/modules/types"
 
 	"github.com/forbole/juno/v5/modules/pruning"
 	"github.com/forbole/juno/v5/modules/telemetry"
 
-	"github.com/forbole/bdjuno/v4/modules/slashing"
+	"github.com/forbole/callisto/v4/modules/slashing"
 
-	"github.com/cosmos/cosmos-sdk/codec"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	jmodules "github.com/forbole/juno/v5/modules"
 	"github.com/forbole/juno/v5/modules/messages"
 	"github.com/forbole/juno/v5/modules/registrar"
 
-	"github.com/forbole/bdjuno/v4/utils"
+	"github.com/forbole/callisto/v4/utils"
 
-	"github.com/forbole/bdjuno/v4/database"
-	"github.com/forbole/bdjuno/v4/modules/assetft"
-	"github.com/forbole/bdjuno/v4/modules/assetnft"
-	"github.com/forbole/bdjuno/v4/modules/auth"
-	"github.com/forbole/bdjuno/v4/modules/bank"
-	"github.com/forbole/bdjuno/v4/modules/consensus"
-	"github.com/forbole/bdjuno/v4/modules/customparams"
-	dailyrefetch "github.com/forbole/bdjuno/v4/modules/daily_refetch"
-	"github.com/forbole/bdjuno/v4/modules/distribution"
-	"github.com/forbole/bdjuno/v4/modules/feegrant"
-	"github.com/forbole/bdjuno/v4/modules/feemodel"
-	"github.com/forbole/bdjuno/v4/modules/gov"
-	"github.com/forbole/bdjuno/v4/modules/mint"
-	"github.com/forbole/bdjuno/v4/modules/modules"
-	"github.com/forbole/bdjuno/v4/modules/pricefeed"
-	"github.com/forbole/bdjuno/v4/modules/staking"
-	"github.com/forbole/bdjuno/v4/modules/upgrade"
+	"github.com/forbole/callisto/v4/database"
+	"github.com/forbole/callisto/v4/modules/auth"
+	"github.com/forbole/callisto/v4/modules/bank"
+	"github.com/forbole/callisto/v4/modules/consensus"
+	"github.com/forbole/callisto/v4/modules/distribution"
+	"github.com/forbole/callisto/v4/modules/feegrant"
+
+	dailyrefetch "github.com/forbole/callisto/v4/modules/daily_refetch"
+	"github.com/forbole/callisto/v4/modules/gov"
+	messagetype "github.com/forbole/callisto/v4/modules/message_type"
+	"github.com/forbole/callisto/v4/modules/mint"
+	"github.com/forbole/callisto/v4/modules/modules"
+	"github.com/forbole/callisto/v4/modules/pricefeed"
+	"github.com/forbole/callisto/v4/modules/staking"
+	"github.com/forbole/callisto/v4/modules/upgrade"
+	juno "github.com/forbole/juno/v5/types"
 )
 
 // UniqueAddressesParser returns a wrapper around the given parser that removes all duplicated addresses
 func UniqueAddressesParser(parser messages.MessageAddressesParser) messages.MessageAddressesParser {
-	return func(cdc codec.Codec, msg sdk.Msg) ([]string, error) {
-		addresses, err := parser(cdc, msg)
+	return func(tx *juno.Tx) ([]string, error) {
+		addresses, err := parser(tx)
 		if err != nil {
 			return nil, err
 		}
@@ -78,33 +74,17 @@ func (r *Registrar) BuildModules(ctx registrar.Context) jmodules.Modules {
 	}
 
 	actionsModule := actions.NewModule(ctx.JunoConfig, ctx.EncodingConfig)
-	authModule := auth.NewModule(sources.AuthSource, r.parser, cdc, db)
-	bankModule := bank.NewModule(r.parser, sources.BankSource, cdc, db, ctx.JunoConfig.Chain.Bech32Prefix)
+	authModule := auth.NewModule(r.parser, cdc, db)
+	bankModule := bank.NewModule(r.parser, sources.BankSource, cdc, db)
 	consensusModule := consensus.NewModule(db)
 	dailyRefetchModule := dailyrefetch.NewModule(ctx.Proxy, db)
 	distrModule := distribution.NewModule(sources.DistrSource, cdc, db)
 	feegrantModule := feegrant.NewModule(cdc, db)
+	messagetypeModule := messagetype.NewModule(r.parser, cdc, db)
 	mintModule := mint.NewModule(sources.MintSource, cdc, db)
 	slashingModule := slashing.NewModule(sources.SlashingSource, cdc, db)
 	stakingModule := staking.NewModule(sources.StakingSource, cdc, db)
-	feeModelModule := feemodel.NewModule(sources.FeeModelSource, cdc, db)
-	customParamsModule := customparams.NewModule(sources.CustomParamsSource, cdc, db)
-	assetFTModule := assetft.NewModule(sources.AssetFTSource, cdc, db)
-	assetNFTModule := assetnft.NewModule(sources.AssetNFTSource, cdc, db)
-	govModule := gov.NewModule(
-		sources.GovSource,
-		authModule,
-		distrModule,
-		mintModule,
-		slashingModule,
-		stakingModule,
-		feeModelModule,
-		customParamsModule,
-		assetFTModule,
-		assetNFTModule,
-		cdc,
-		db,
-	)
+	govModule := gov.NewModule(sources.GovSource, distrModule, mintModule, slashingModule, stakingModule, cdc, db)
 	upgradeModule := upgrade.NewModule(db, stakingModule)
 
 	return []jmodules.Module{
@@ -121,16 +101,11 @@ func (r *Registrar) BuildModules(ctx registrar.Context) jmodules.Modules {
 		feegrantModule,
 		govModule,
 		mintModule,
+		messagetypeModule,
 		modules.NewModule(ctx.JunoConfig.Chain, db),
 		pricefeed.NewModule(ctx.JunoConfig, cdc, db),
 		slashingModule,
 		stakingModule,
 		upgradeModule,
-		feeModelModule,
-		customParamsModule,
-		assetFTModule,
-		assetNFTModule,
-		// This must be the last item.
-		addresses.NewModule(r.parser, cdc, db),
 	}
 }

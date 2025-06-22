@@ -4,27 +4,21 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	govtypesv1beta1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	"github.com/rs/zerolog/log"
-
-	assetfttypes "github.com/CoreumFoundation/coreum/v4/x/asset/ft/types"
-	assetnfttypes "github.com/CoreumFoundation/coreum/v4/x/asset/nft/types"
-	customparamstypes "github.com/CoreumFoundation/coreum/v4/x/customparams/types"
-	feemodeltypes "github.com/CoreumFoundation/coreum/v4/x/feemodel/types"
 
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	proposaltypes "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
-
 	"google.golang.org/grpc/codes"
 
-	"github.com/forbole/bdjuno/v4/types"
+	"github.com/forbole/callisto/v4/types"
 
 	gov "github.com/cosmos/cosmos-sdk/x/gov/types"
 )
@@ -127,11 +121,6 @@ func (m *Module) updateDeletedProposalStatus(id uint64) error {
 // handleParamChangeProposal updates params to the corresponding modules if a ParamChangeProposal has passed
 func (m *Module) handleParamChangeProposal(height int64, moduleName string) (err error) {
 	switch moduleName {
-	case authtypes.ModuleName:
-		err = m.authModule.UpdateParams(height)
-		if err != nil {
-			return fmt.Errorf("error while updating ParamChangeProposal %s params : %s", authtypes.ModuleName, err)
-		}
 	case distrtypes.ModuleName:
 		err = m.distrModule.UpdateParams(height)
 		if err != nil {
@@ -162,26 +151,6 @@ func (m *Module) handleParamChangeProposal(height int64, moduleName string) (err
 		err = m.stakingModule.UpdateParams(height)
 		if err != nil {
 			return fmt.Errorf("error while updating ParamChangeProposal %s params : %s", stakingtypes.ModuleName, err)
-		}
-	case feemodeltypes.ModuleName:
-		err = m.feeModelModule.UpdateParams(height)
-		if err != nil {
-			return fmt.Errorf("error while updating ParamChangeProposal %s params : %s", feemodeltypes.ModuleName, err)
-		}
-	case customparamstypes.CustomParamsStaking:
-		err = m.customParamsModule.UpdateParams(height)
-		if err != nil {
-			return fmt.Errorf("error while updating ParamChangeProposal %s params : %s", customparamstypes.ModuleName, err)
-		}
-	case assetfttypes.ModuleName:
-		err = m.assetFTModule.UpdateParams(height)
-		if err != nil {
-			return fmt.Errorf("error while updating ParamChangeProposal %s params : %s", assetfttypes.ModuleName, err)
-		}
-	case assetnfttypes.ModuleName:
-		err = m.assetNFTModule.UpdateParams(height)
-		if err != nil {
-			return fmt.Errorf("error while updating ParamChangeProposal %s params : %s", assetnfttypes.ModuleName, err)
 		}
 	}
 
@@ -317,7 +286,8 @@ func getParamChangeSubspace(msg sdk.Msg) (string, bool) {
 func (m *Module) handlePassedV1Beta1Proposal(proposal *govtypesv1.Proposal, msg *govtypesv1.MsgExecLegacyContent, height int64) error {
 	// Unpack proposal
 	var content govtypesv1beta1.Content
-	err := m.cdc.UnpackAny(msg.Content, &content)
+	var protoCodec codec.ProtoCodec
+	err := protoCodec.UnpackAny(msg.Content, &content)
 	if err != nil {
 		return fmt.Errorf("error while handling ParamChangeProposal: %s", err)
 	}
