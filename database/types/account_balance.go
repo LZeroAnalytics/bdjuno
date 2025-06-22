@@ -22,5 +22,5 @@ func NewAccountBalance(address string, coin sdk.Coin, height int64) AccountBalan
 
 // Equals return true if one row represents the same row as the original one
 func (v AccountBalance) Equals(w AccountBalance) bool {
-	return v.Address == w.Address && v.Denom == v.Denom && v.Amount == v.Amount
+	return v.Address == w.Address && v.Denom == w.Denom && v.Amount == w.Amount
 }
