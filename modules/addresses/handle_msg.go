@@ -9,7 +9,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/gogoproto/proto"
 	juno "github.com/forbole/juno/v5/types"
-	"github.com/samber/lo"
 )
 
 // HandleMsg implements MessageModule
@@ -41,7 +40,7 @@ func (m *Module) HandleMsg(index int, msg sdk.Msg, tx *juno.Tx) error {
 
 func (m *Module) collectAddresses(msg sdk.Msg, tx *juno.Tx) ([]string, error) {
 	// get the involved addresses with general parser first
-	messageAddresses, err := m.messageParser(m.cdc, msg)
+	messageAddresses, err := m.messageParser(tx)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +55,11 @@ func (m *Module) collectAddresses(msg sdk.Msg, tx *juno.Tx) ([]string, error) {
 		return nil, err
 	}
 
-	return lo.Keys(addresses), nil
+	result := make([]string, 0, len(addresses))
+	for address := range addresses {
+		result = append(result, address)
+	}
+	return result, nil
 }
 
 func addBech32MsgValues(addressSet map[string]struct{}, cdc codec.Codec, msg sdk.Msg) error {
