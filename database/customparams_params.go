@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/forbole/bdjuno/v4/types"
+	"github.com/forbole/callisto/v4/types"
 
-	dbtypes "github.com/forbole/bdjuno/v4/database/types"
+	dbtypes "github.com/forbole/callisto/v4/database/types"
 )
 
 // SaveCustomParamsParams saves the given x/customparams parameters inside the database
