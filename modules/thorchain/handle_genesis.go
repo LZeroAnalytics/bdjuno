@@ -141,15 +141,7 @@ func (m *Module) convertNodeAccountToValidator(height int64, nodeAccount NodeAcc
 	), nil
 }
 
-func (m *Module) parseConsPubKey(pubKeyStr string) error {
-	if len(pubKeyStr) == 0 {
-		return fmt.Errorf("empty public key string")
-	}
-	
-	log.Warn().Str("pubkey", pubKeyStr).Msg("THORChain consensus public key parsing not yet implemented")
-	
-	return fmt.Errorf("THORChain consensus public key parsing not yet implemented for: %s", pubKeyStr)
-}
+
 
 func (m *Module) convertNodeAccountStatus(status string) int {
 	switch status {
