@@ -29,6 +29,7 @@ import (
 	"github.com/forbole/callisto/v4/modules/modules"
 	"github.com/forbole/callisto/v4/modules/pricefeed"
 	"github.com/forbole/callisto/v4/modules/staking"
+	"github.com/forbole/callisto/v4/modules/thorchain"
 	"github.com/forbole/callisto/v4/modules/upgrade"
 	juno "github.com/forbole/juno/v5/types"
 )
@@ -84,10 +85,13 @@ func (r *Registrar) BuildModules(ctx registrar.Context) jmodules.Modules {
 	mintModule := mint.NewModule(sources.MintSource, cdc, db)
 	slashingModule := slashing.NewModule(sources.SlashingSource, cdc, db)
 	stakingModule := staking.NewModule(sources.StakingSource, cdc, db)
+	thorchainModule := thorchain.NewModule(cdc, db)
 	govModule := gov.NewModule(sources.GovSource, distrModule, mintModule, slashingModule, stakingModule, cdc, db)
 	upgradeModule := upgrade.NewModule(db, stakingModule)
 
-	return []jmodules.Module{
+	isThorchain := ctx.JunoConfig.Chain.Bech32Prefix == "thor"
+	
+	modules := []jmodules.Module{
 		messages.NewModule(r.parser, cdc, ctx.Database),
 		telemetry.NewModule(ctx.JunoConfig),
 		pruning.NewModule(ctx.JunoConfig, db, ctx.Logger),
@@ -104,8 +108,14 @@ func (r *Registrar) BuildModules(ctx registrar.Context) jmodules.Modules {
 		messagetypeModule,
 		modules.NewModule(ctx.JunoConfig.Chain, db),
 		pricefeed.NewModule(ctx.JunoConfig, cdc, db),
-		slashingModule,
-		stakingModule,
 		upgradeModule,
 	}
+
+	if isThorchain {
+		modules = append(modules, thorchainModule)
+	} else {
+		modules = append(modules, slashingModule, stakingModule)
+	}
+
+	return modules
 }
