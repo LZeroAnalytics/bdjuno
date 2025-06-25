@@ -55,7 +55,7 @@ func (m *Module) saveValidatorsFromNodeAccounts(doc *tmtypes.GenesisDoc, nodeAcc
 			Details:         "",
 		}
 		description := types.NewValidatorDescription(
-			validator.GetConsAddr(),
+			validator.GetOperator(),
 			stakingDesc,
 			"",
 			doc.InitialHeight,
@@ -63,7 +63,7 @@ func (m *Module) saveValidatorsFromNodeAccounts(doc *tmtypes.GenesisDoc, nodeAcc
 		validatorDescriptions = append(validatorDescriptions, description)
 
 		commission := types.NewValidatorCommission(
-			validator.GetConsAddr(),
+			validator.GetOperator(),
 			nil,
 			nil,
 			doc.InitialHeight,
