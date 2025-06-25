@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	tmtypes "github.com/cometbft/cometbft/types"
-	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/rs/zerolog/log"
@@ -142,14 +141,14 @@ func (m *Module) convertNodeAccountToValidator(height int64, nodeAccount NodeAcc
 	), nil
 }
 
-func (m *Module) parseConsPubKey(pubKeyStr string) (cryptotypes.PubKey, error) {
+func (m *Module) parseConsPubKey(pubKeyStr string) error {
 	if len(pubKeyStr) == 0 {
-		return nil, fmt.Errorf("empty public key string")
+		return fmt.Errorf("empty public key string")
 	}
 	
 	log.Warn().Str("pubkey", pubKeyStr).Msg("THORChain consensus public key parsing not yet implemented")
 	
-	return nil, fmt.Errorf("consensus public key parsing not implemented for THORChain format: %s", pubKeyStr)
+	return fmt.Errorf("consensus public key parsing not implemented for THORChain format: %s", pubKeyStr)
 }
 
 func (m *Module) convertNodeAccountStatus(status string) int {
