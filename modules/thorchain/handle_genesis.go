@@ -5,6 +5,9 @@ import (
 	"fmt"
 
 	tmtypes "github.com/cometbft/cometbft/types"
+	"github.com/cosmos/cosmos-sdk/crypto/ed25519"
+	"github.com/cosmos/cosmos-sdk/types/bech32"
+	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/rs/zerolog/log"
@@ -45,34 +48,34 @@ func (m *Module) saveValidatorsFromNodeAccounts(doc *tmtypes.GenesisDoc, nodeAcc
 		validators = append(validators, validator)
 
 		stakingDesc := stakingtypes.Description{
-			Moniker:         nodeAccount.NodeAddress, // Use node address as moniker for now
+			Moniker:         nodeAccount.NodeAddress,
 			Identity:        "",
 			Website:         "",
 			SecurityContact: "",
 			Details:         "",
 		}
 		description := types.NewValidatorDescription(
-			nodeAccount.NodeAddress,
+			validator.GetConsAddr(),
 			stakingDesc,
-			"", // avatar URL
+			"",
 			doc.InitialHeight,
 		)
 		validatorDescriptions = append(validatorDescriptions, description)
 
 		commission := types.NewValidatorCommission(
-			nodeAccount.NodeAddress,
-			nil, // commission rate - thorchain doesn't use this
-			nil, // min self delegation - thorchain doesn't use this
+			validator.GetConsAddr(),
+			nil,
+			nil,
 			doc.InitialHeight,
 		)
 		validatorCommissions = append(validatorCommissions, commission)
 
 		status := m.convertNodeAccountStatus(nodeAccount.Status)
 		validatorStatus := types.NewValidatorStatus(
-			nodeAccount.NodeAddress,
-			nodeAccount.ValidatorConsPubKey,
+			validator.GetConsAddr(),
+			validator.GetConsPubKey(),
 			status,
-			false, // jailed - we'll set this based on status
+			false,
 			doc.InitialHeight,
 		)
 		validatorStatuses = append(validatorStatuses, validatorStatus)
@@ -111,34 +114,66 @@ func (m *Module) saveValidatorsFromNodeAccounts(doc *tmtypes.GenesisDoc, nodeAcc
 }
 
 func (m *Module) convertNodeAccountToValidator(height int64, nodeAccount NodeAccount) (types.Validator, error) {
-	consPubKey := nodeAccount.ValidatorConsPubKey
-	if consPubKey == "" {
+	consPubKeyStr := nodeAccount.ValidatorConsPubKey
+	if consPubKeyStr == "" {
 		return nil, fmt.Errorf("missing validator consensus public key for node %s", nodeAccount.NodeAddress)
 	}
 
-	maxChangeRate := sdk.NewDecWithPrec(1, 2) // 1%
-	maxRate := sdk.NewDecWithPrec(20, 2)      // 20%
+	consPubKey, err := m.parseConsPubKey(consPubKeyStr)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse consensus public key for node %s: %s", nodeAccount.NodeAddress, err)
+	}
+
+	consAddr, err := m.hexToBech32(fmt.Sprintf("%X", consPubKey.Address()), "thorvalcons")
+	if err != nil {
+		return nil, fmt.Errorf("failed to convert consensus address to bech32 for node %s: %s", nodeAccount.NodeAddress, err)
+	}
+
+	maxChangeRate := sdk.NewDecWithPrec(1, 2)
+	maxRate := sdk.NewDecWithPrec(20, 2)
 
 	return types.NewValidator(
-		nodeAccount.NodeAddress, // consensus address - use node address
-		nodeAccount.NodeAddress, // operator address
-		consPubKey,
-		nodeAccount.NodeAddress, // self delegate address - use node address
+		consAddr,
+		nodeAccount.NodeAddress,
+		consPubKey.String(),
+		nodeAccount.NodeAddress,
 		&maxChangeRate,
 		&maxRate,
 		height,
 	), nil
 }
 
+func (m *Module) parseConsPubKey(pubKeyStr string) (cryptotypes.PubKey, error) {
+	if len(pubKeyStr) == 0 {
+		return nil, fmt.Errorf("empty public key string")
+	}
+	
+	pubKeyBytes, err := sdk.GetFromBech32(pubKeyStr, "thorcpub")
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode bech32 public key: %s", err)
+	}
+	
+	return &ed25519.PubKey{Key: pubKeyBytes}, nil
+}
+
+func (m *Module) hexToBech32(address string, prefix string) (string, error) {
+	addressBytes, err := sdk.AccAddressFromHex(address)
+	if err != nil {
+		return "", fmt.Errorf("failed to decode hex address: %s", err)
+	}
+	
+	return bech32.Encode(prefix, bech32.ToWords(addressBytes))
+}
+
 func (m *Module) convertNodeAccountStatus(status string) int {
 	switch status {
 	case "Active":
-		return 3 // BOND_STATUS_BONDED
+		return 3
 	case "Standby":
-		return 2 // BOND_STATUS_UNBONDING
+		return 2
 	case "Disabled":
-		return 1 // BOND_STATUS_UNBONDED
+		return 1
 	default:
-		return 1 // BOND_STATUS_UNBONDED
+		return 1
 	}
 }
