@@ -22,25 +22,25 @@ func (gs *GenesisState) String() string {
 }
 
 type NodeAccount struct {
-	NodeAddress           string    `json:"node_address"`
-	Status                string    `json:"status"`
-	PubKeySet             PubKeySet `json:"pub_key_set"`
-	ValidatorConsPubKey   string    `json:"validator_cons_pub_key"`
-	Bond                  string    `json:"bond"`
-	ActiveBlockHeight     string    `json:"active_block_height"`
-	BondAddress           string    `json:"bond_address"`
-	StatusSince           string    `json:"status_since,omitempty"`
-	SignerMembership      []string  `json:"signer_membership"`
-	RequestedToLeave      bool      `json:"requested_to_leave,omitempty"`
-	ForcedToLeave         bool      `json:"forced_to_leave,omitempty"`
-	LeaveScore            string    `json:"leave_score,omitempty"`
-	IPAddress             string    `json:"ip_address"`
-	Version               string    `json:"version"`
-	SlashPoints           string    `json:"slash_points,omitempty"`
-	Jail                  Jail      `json:"jail,omitempty"`
-	CurrentAward          string    `json:"current_award,omitempty"`
-	ObserveChains         []Chain   `json:"observe_chains,omitempty"`
-	PreflightStatus       string    `json:"preflight_status,omitempty"`
+	NodeAddress         string    `json:"node_address"`
+	Status              string    `json:"status"`
+	PubKeySet           PubKeySet `json:"pub_key_set"`
+	ValidatorConsPubKey string    `json:"validator_cons_pub_key"`
+	Bond                string    `json:"bond"`
+	ActiveBlockHeight   string    `json:"active_block_height"`
+	BondAddress         string    `json:"bond_address"`
+	StatusSince         string    `json:"status_since,omitempty"`
+	SignerMembership    []string  `json:"signer_membership"`
+	RequestedToLeave    bool      `json:"requested_to_leave,omitempty"`
+	ForcedToLeave       bool      `json:"forced_to_leave,omitempty"`
+	LeaveScore          string    `json:"leave_score,omitempty"`
+	IPAddress           string    `json:"ip_address"`
+	Version             string    `json:"version"`
+	SlashPoints         string    `json:"slash_points,omitempty"`
+	Jail                Jail      `json:"jail,omitempty"`
+	CurrentAward        string    `json:"current_award,omitempty"`
+	ObserveChains       []Chain   `json:"observe_chains,omitempty"`
+	PreflightStatus     string    `json:"preflight_status,omitempty"`
 }
 
 type PubKeySet struct {
@@ -60,8 +60,8 @@ type Chain struct {
 }
 
 type ChainContract struct {
-	Chain   string `json:"chain"`
-	Router  string `json:"router,omitempty"`
+	Chain  string `json:"chain"`
+	Router string `json:"router,omitempty"`
 }
 
 func (gs *GenesisState) UnmarshalJSON(data []byte) error {

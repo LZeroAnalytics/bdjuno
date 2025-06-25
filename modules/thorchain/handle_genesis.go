@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 
+	tmtypes "github.com/cometbft/cometbft/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	tmtypes "github.com/cometbft/cometbft/types"
 	"github.com/rs/zerolog/log"
 
 	"github.com/forbole/callisto/v4/types"

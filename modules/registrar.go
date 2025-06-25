@@ -90,7 +90,7 @@ func (r *Registrar) BuildModules(ctx registrar.Context) jmodules.Modules {
 	upgradeModule := upgrade.NewModule(db, stakingModule)
 
 	isThorchain := ctx.JunoConfig.Chain.Bech32Prefix == "thor"
-	
+
 	modules := []jmodules.Module{
 		messages.NewModule(r.parser, cdc, ctx.Database),
 		telemetry.NewModule(ctx.JunoConfig),
