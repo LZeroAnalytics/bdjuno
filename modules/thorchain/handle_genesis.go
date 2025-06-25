@@ -120,9 +120,9 @@ func (m *Module) convertNodeAccountToValidator(height int64, nodeAccount NodeAcc
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse node address %s: %s", nodeAccount.NodeAddress, err)
 	}
-	
+
 	consAddr := sdk.ConsAddress(nodeAddr[:20])
-	
+
 	log.Warn().Str("node_address", nodeAccount.NodeAddress).
 		Str("cons_addr", consAddr.String()).
 		Msg("using temporary consensus address generation - needs proper thorcpub parsing")
@@ -140,8 +140,6 @@ func (m *Module) convertNodeAccountToValidator(height int64, nodeAccount NodeAcc
 		height,
 	), nil
 }
-
-
 
 func (m *Module) convertNodeAccountStatus(status string) int {
 	switch status {
