@@ -1,13 +1,10 @@
 package thorchain
 
 import (
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 
 	tmtypes "github.com/cometbft/cometbft/types"
-	"github.com/cosmos/cosmos-sdk/crypto/ed25519"
-	"github.com/cosmos/cosmos-sdk/types/bech32"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
@@ -125,10 +122,7 @@ func (m *Module) convertNodeAccountToValidator(height int64, nodeAccount NodeAcc
 		return nil, fmt.Errorf("failed to parse consensus public key for node %s: %s", nodeAccount.NodeAddress, err)
 	}
 
-	consAddr, err := m.hexToBech32(fmt.Sprintf("%X", consPubKey.Address()), "thorvalcons")
-	if err != nil {
-		return nil, fmt.Errorf("failed to convert consensus address to bech32 for node %s: %s", nodeAccount.NodeAddress, err)
-	}
+	consAddr := sdk.ConsAddress(consPubKey.Address()).String()
 
 	maxChangeRate := sdk.NewDecWithPrec(1, 2)
 	maxRate := sdk.NewDecWithPrec(20, 2)
@@ -149,21 +143,7 @@ func (m *Module) parseConsPubKey(pubKeyStr string) (cryptotypes.PubKey, error) {
 		return nil, fmt.Errorf("empty public key string")
 	}
 	
-	pubKeyBytes, err := sdk.GetFromBech32(pubKeyStr, "thorcpub")
-	if err != nil {
-		return nil, fmt.Errorf("failed to decode bech32 public key: %s", err)
-	}
-	
-	return &ed25519.PubKey{Key: pubKeyBytes}, nil
-}
-
-func (m *Module) hexToBech32(address string, prefix string) (string, error) {
-	addressBytes, err := hex.DecodeString(address)
-	if err != nil {
-		return "", fmt.Errorf("failed to decode hex address: %s", err)
-	}
-	
-	return bech32.Encode(prefix, bech32.ToWords(addressBytes))
+	return nil, fmt.Errorf("THORChain consensus public key parsing not yet implemented for: %s", pubKeyStr)
 }
 
 func (m *Module) convertNodeAccountStatus(status string) int {
