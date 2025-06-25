@@ -148,7 +148,7 @@ func (m *Module) parseConsPubKey(pubKeyStr string) error {
 	
 	log.Warn().Str("pubkey", pubKeyStr).Msg("THORChain consensus public key parsing not yet implemented")
 	
-	return fmt.Errorf("consensus public key parsing not implemented for THORChain format: %s", pubKeyStr)
+	return fmt.Errorf("THORChain consensus public key parsing not yet implemented for: %s", pubKeyStr)
 }
 
 func (m *Module) convertNodeAccountStatus(status string) int {
