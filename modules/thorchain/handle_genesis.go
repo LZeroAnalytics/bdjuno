@@ -1,6 +1,7 @@
 package thorchain
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 
@@ -157,7 +158,7 @@ func (m *Module) parseConsPubKey(pubKeyStr string) (cryptotypes.PubKey, error) {
 }
 
 func (m *Module) hexToBech32(address string, prefix string) (string, error) {
-	addressBytes, err := sdk.AccAddressFromHex(address)
+	addressBytes, err := hex.DecodeString(address)
 	if err != nil {
 		return "", fmt.Errorf("failed to decode hex address: %s", err)
 	}
