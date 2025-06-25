@@ -117,20 +117,24 @@ func (m *Module) convertNodeAccountToValidator(height int64, nodeAccount NodeAcc
 		return nil, fmt.Errorf("missing validator consensus public key for node %s", nodeAccount.NodeAddress)
 	}
 
-	consPubKey, err := m.parseConsPubKey(consPubKeyStr)
+	nodeAddr, err := sdk.AccAddressFromBech32(nodeAccount.NodeAddress)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse consensus public key for node %s: %s", nodeAccount.NodeAddress, err)
+		return nil, fmt.Errorf("failed to parse node address %s: %s", nodeAccount.NodeAddress, err)
 	}
-
-	consAddr := sdk.ConsAddress(consPubKey.Address()).String()
+	
+	consAddr := sdk.ConsAddress(nodeAddr[:20])
+	
+	log.Warn().Str("node_address", nodeAccount.NodeAddress).
+		Str("cons_addr", consAddr.String()).
+		Msg("using temporary consensus address generation - needs proper thorcpub parsing")
 
 	maxChangeRate := sdk.NewDecWithPrec(1, 2)
 	maxRate := sdk.NewDecWithPrec(20, 2)
 
 	return types.NewValidator(
-		consAddr,
+		consAddr.String(),
 		nodeAccount.NodeAddress,
-		consPubKey.String(),
+		consPubKeyStr, // Use the original pubkey string for now
 		nodeAccount.NodeAddress,
 		&maxChangeRate,
 		&maxRate,
@@ -143,7 +147,9 @@ func (m *Module) parseConsPubKey(pubKeyStr string) (cryptotypes.PubKey, error) {
 		return nil, fmt.Errorf("empty public key string")
 	}
 	
-	return nil, fmt.Errorf("THORChain consensus public key parsing not yet implemented for: %s", pubKeyStr)
+	log.Warn().Str("pubkey", pubKeyStr).Msg("THORChain consensus public key parsing not yet implemented")
+	
+	return nil, fmt.Errorf("consensus public key parsing not implemented for THORChain format: %s", pubKeyStr)
 }
 
 func (m *Module) convertNodeAccountStatus(status string) int {
