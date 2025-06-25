@@ -116,11 +116,6 @@ func (m *Module) convertNodeAccountToValidator(height int64, nodeAccount NodeAcc
 		return nil, fmt.Errorf("missing validator consensus public key for node %s", nodeAccount.NodeAddress)
 	}
 
-	bondAmount := nodeAccount.Bond
-	if bondAmount == "" {
-		bondAmount = "0"
-	}
-
 	maxChangeRate := sdk.NewDecWithPrec(1, 2) // 1%
 	maxRate := sdk.NewDecWithPrec(20, 2)      // 20%
 
