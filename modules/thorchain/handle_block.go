@@ -13,6 +13,5 @@ func (m *Module) HandleBlock(
 	log.Debug().Str("module", "thorchain").Int64("height", block.Block.Height).
 		Msg("processing block")
 
-
 	return nil
 }
