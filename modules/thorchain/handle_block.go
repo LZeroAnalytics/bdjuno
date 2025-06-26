@@ -26,6 +26,11 @@ func (m *Module) HandleBlock(
 		return fmt.Errorf("error while saving validator voting powers: %s", err)
 	}
 
+	err = m.updateBlockProposer(block.Block.Height, block.Block.ProposerAddress)
+	if err != nil {
+		return fmt.Errorf("error while updating block proposer: %s", err)
+	}
+
 	return nil
 }
 
@@ -76,4 +81,27 @@ func (m *Module) convertValidatorAddressToConsensus(validatorAddr []byte) (strin
 	}
 
 	return bech32Addr, nil
+}
+
+func (m *Module) updateBlockProposer(height int64, proposerAddr []byte) error {
+	if len(proposerAddr) == 0 {
+		log.Debug().Str("module", "thorchain").Int64("height", height).
+			Msg("no proposer address in block, skipping update")
+		return nil
+	}
+
+	consAddr, err := m.convertValidatorAddressToConsensus(proposerAddr)
+	if err != nil {
+		return fmt.Errorf("failed to convert proposer address to consensus address: %s", err)
+	}
+
+	err = m.db.UpdateBlockProposerAddress(height, consAddr)
+	if err != nil {
+		return fmt.Errorf("failed to update block proposer address: %s", err)
+	}
+
+	log.Debug().Str("module", "thorchain").Int64("height", height).
+		Str("proposer_address", consAddr).Msg("updated block proposer address")
+
+	return nil
 }

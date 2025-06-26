@@ -188,3 +188,16 @@ func (db *Db) GetGenesis() (*types.Genesis, error) {
 	row := rows[0]
 	return types.NewGenesis(row.ChainID, row.Time, row.InitialHeight), nil
 }
+
+// -------------------------------------------------------------------------------------------------------------------
+
+func (db *Db) UpdateBlockProposerAddress(height int64, proposerAddress string) error {
+	stmt := `UPDATE block SET proposer_address = $1 WHERE height = $2`
+	
+	_, err := db.Sqlx.Exec(stmt, proposerAddress, height)
+	if err != nil {
+		return fmt.Errorf("error while updating block proposer address: %s", err)
+	}
+	
+	return nil
+}
