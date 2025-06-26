@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/cosmos/cosmos-sdk/types/bech32"
 	tmtypes "github.com/cometbft/cometbft/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
@@ -122,18 +123,19 @@ func (m *Module) convertNodeAccountToValidator(height int64, nodeAccount NodeAcc
 	}
 
 	consAddr := sdk.ConsAddress(nodeAddr[:20])
-
-	log.Warn().Str("node_address", nodeAccount.NodeAddress).
-		Str("cons_addr", consAddr.String()).
-		Msg("using temporary consensus address generation - needs proper thorcpub parsing")
+	
+	bech32ConsAddr, err := bech32.ConvertAndEncode("thorvalcons", consAddr)
+	if err != nil {
+		return nil, fmt.Errorf("failed to convert consensus address to bech32: %s", err)
+	}
 
 	maxChangeRate := sdk.NewDecWithPrec(1, 2)
 	maxRate := sdk.NewDecWithPrec(20, 2)
 
 	return types.NewValidator(
-		consAddr.String(),
+		bech32ConsAddr,
 		nodeAccount.NodeAddress,
-		consPubKeyStr, // Use the original pubkey string for now
+		consPubKeyStr,
 		nodeAccount.NodeAddress,
 		&maxChangeRate,
 		&maxRate,
