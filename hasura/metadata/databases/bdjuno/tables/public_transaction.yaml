@@ -24,3 +24,20 @@ select_permissions:
     filter: {}
     limit: 100
   role: anonymous
+subscription_permissions:
+- permission:
+    columns:
+    - hash
+    - height
+    - success
+    - messages
+    - memo
+    - signatures
+    - signer_infos
+    - fee
+    - gas_wanted
+    - gas_used
+    - raw_log
+    - logs
+    filter: {}
+  role: anonymous
