@@ -16,3 +16,12 @@ select_permissions:
     filter: {}
     limit: 1
   role: anonymous
+subscription_permissions:
+- permission:
+    columns:
+    - unit_name
+    - price
+    - market_cap
+    - timestamp
+    filter: {}
+  role: anonymous
