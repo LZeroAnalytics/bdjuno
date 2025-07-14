@@ -6,12 +6,18 @@ RUN go mod download
 RUN make build
 
 FROM debian:stable-slim
+ARG TARGETARCH 
 RUN apt-get update \
  && apt-get install -y --no-install-recommends curl ca-certificates bash \
  && rm -rf /var/lib/apt/lists/*
 
-RUN curl -L https://github.com/hasura/graphql-engine/raw/stable/cli/get.sh | bash \
- && hasura plugins install cli-ext
+RUN curl -L https://github.com/hasura/graphql-engine/raw/stable/cli/get.sh | bash
+
+RUN if [ "$TARGETARCH" = "amd64" ]; then \
+      hasura plugins install cli-ext ; \
+    else \
+      echo "Skipping cli-ext on $TARGETARCH (not published)"; \
+    fi
 
 WORKDIR /callisto
 COPY --from=builder /go/src/github.com/forbole/callisto/build/callisto /usr/bin/callisto
