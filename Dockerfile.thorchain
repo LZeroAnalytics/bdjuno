@@ -22,5 +22,6 @@ RUN if [ "$TARGETARCH" = "amd64" ]; then \
 WORKDIR /callisto
 COPY --from=builder /go/src/github.com/forbole/callisto/build/callisto /usr/bin/callisto
 COPY config-thorchain.yaml /callisto/config.yaml
+COPY hasura /hasura
 EXPOSE 3000
 CMD [ "callisto", "parse", "/callisto/config.yaml" ]
